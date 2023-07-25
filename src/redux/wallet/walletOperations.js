@@ -26,9 +26,8 @@ export const getBalance = createAsyncThunk("ethereum/balance", async () => {
       const signer = await provider.getSigner();
       const accounts = await signer.getAddress();
       const balance = await provider.getBalance(accounts);
-      //   const balanceInEth = provider.utils.formatEther(balance);
 
-      return parseFloat(ethers.utils.formatEther(balance)).toFixed(3);
+      return parseFloat(ethers.formatEther(balance)).toFixed(3);
     } catch (error) {
       console.error(error);
     }
@@ -36,3 +35,26 @@ export const getBalance = createAsyncThunk("ethereum/balance", async () => {
     console.error("Please install MetaMask on your browser");
   }
 });
+
+export const transferToken = createAsyncThunk(
+  "ethereum/tranfer",
+  async ({ adrress, value }) => {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const transaction = {
+          to: adrress,
+          value: ethers.parseEther(value),
+        };
+        const sendTransaction = await signer.sendTransaction(transaction);
+
+        console.log(sendTransaction);
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      console.error("Please install MetaMask on your browser");
+    }
+  }
+);

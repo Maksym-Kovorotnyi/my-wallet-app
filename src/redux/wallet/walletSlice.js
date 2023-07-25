@@ -1,11 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { connectToMetaMask, getBalance } from "./walletOperations";
+import {
+  connectToMetaMask,
+  getBalance,
+  transferToken,
+} from "./walletOperations";
 
 const walletInitialState = {
   isConnected: false,
   isLoading: false,
-  account: null,
-  address: null,
   balance: null,
   accounts: null,
 };
@@ -25,11 +27,13 @@ const walletSlice = createSlice({
       state.isConnected = true;
       state.accounts = payload;
     });
+    builder.addCase(getBalance.pending, () => {});
+    builder.addCase(getBalance.rejected, () => {});
     builder.addCase(getBalance.fulfilled, (state, { payload }) => {
       state.balance = payload;
     });
+    builder.addCase(transferToken.fulfilled, () => {});
   },
 });
 
 export const walletReducer = walletSlice.reducer;
-getBalance;
