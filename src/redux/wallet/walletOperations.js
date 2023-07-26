@@ -2,18 +2,12 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
 
-const METAMASKERROR = new Error(toast.error("Please install MetaMask"));
-
 export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
   async () => {
-    if (
-      typeof window.ethereum !== "undefined" ||
-      (navigator.userAgent.toLowerCase().includes("mobile") &&
-        navigator.userAgent.toLowerCase().includes("metamask"))
-    ) {
+    if (typeof window.ethereum !== "undefined") {
       try {
-        const provider = new ethers.BrowserProvider(ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const account = await signer.getAddress();
         return account;
@@ -25,7 +19,7 @@ export const connectToMetaMask = createAsyncThunk(
         }
       }
     } else {
-      throw METAMASKERROR;
+      throw new Error(toast.error("Please install MetaMask"));
     }
   }
 );
@@ -42,7 +36,7 @@ export const getBalance = createAsyncThunk("ethereum/balance", async () => {
       toast.error(error.info.error.message);
     }
   } else {
-    throw METAMASKERROR;
+    throw new Error(toast.error("Please install MetaMask"));
   }
 });
 
@@ -69,7 +63,10 @@ export const transferToken = createAsyncThunk(
         toast.error(error);
       }
     } else {
-      throw METAMASKERROR;
+      throw new Error(toast.error("Please install MetaMask"));
     }
   }
 );
+
+// (navigator.userAgent.toLowerCase().includes("mobile") &&
+//         navigator.userAgent.toLowerCase().includes("metamask")
