@@ -7,8 +7,11 @@ const METAMASKERROR = new Error(toast.error("Please install MetaMask"));
 export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
   async () => {
-    const { ethereum } = window;
-    if (ethereum.isMetaMask) {
+    if (
+      typeof window.ethereum !== "undefined" ||
+      (navigator.userAgent.toLowerCase().includes("mobile") &&
+        navigator.userAgent.toLowerCase().includes("metamask"))
+    ) {
       try {
         const provider = new ethers.BrowserProvider(ethereum);
         const signer = await provider.getSigner();
