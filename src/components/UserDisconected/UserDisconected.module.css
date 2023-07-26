@@ -1,0 +1,13 @@
+.btn {
+    width: 150px;
+    background-color: #FEF9F9;
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 15px;
+}
+
+.btn:hover,
+.btn:focus {
+    cursor: pointer;
+    background-color: #efebeb;
+}

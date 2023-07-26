@@ -1,5 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import {
+  persistStore,
+  persistReducer,
   FLUSH,
   REHYDRATE,
   PAUSE,
@@ -8,9 +10,16 @@ import {
   REGISTER,
 } from "redux-persist";
 import { walletReducer } from "./wallet/walletSlice";
+import storage from "redux-persist/lib/storage";
+
+const persistConfig = {
+  key: "isConnected",
+  storage,
+  whitelist: ["isConnected"],
+};
 
 export const store = configureStore({
-  reducer: walletReducer,
+  reducer: persistReducer(persistConfig, walletReducer),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -18,3 +27,5 @@ export const store = configureStore({
       },
     }),
 });
+
+export const persistor = persistStore(store);

@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
+import { toast } from "react-toastify";
 
 export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
@@ -8,13 +9,17 @@ export const connectToMetaMask = createAsyncThunk(
       try {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
-        const accounts = await signer.getAddress();
-        return accounts;
+        const account = await signer.getAddress();
+        return account;
       } catch (error) {
-        console.error(error);
+        if (error.info.error.code === 4001) {
+          throw new Error(toast.error("User reject connection"));
+        } else {
+          toast.error(error.info.error.message);
+        }
       }
     } else {
-      console.error("Please install MetaMask on your browser");
+      toast.error("Please install MetaMask on your browser");
     }
   }
 );
@@ -26,13 +31,12 @@ export const getBalance = createAsyncThunk("ethereum/balance", async () => {
       const signer = await provider.getSigner();
       const accounts = await signer.getAddress();
       const balance = await provider.getBalance(accounts);
-
       return parseFloat(ethers.formatEther(balance)).toFixed(3);
     } catch (error) {
-      console.error(error);
+      toast.error(error.info.error.message);
     }
   } else {
-    console.error("Please install MetaMask on your browser");
+    toast.error("Please install MetaMask on your browser");
   }
 });
 
@@ -47,14 +51,19 @@ export const transferToken = createAsyncThunk(
           to: adrress,
           value: ethers.parseEther(value),
         };
-        const sendTransaction = await signer.sendTransaction(transaction);
-
-        console.log(sendTransaction);
+        await signer.sendTransaction(transaction);
+        return toast.success("Transaction success");
       } catch (error) {
-        console.error(error);
+        if (error.info.error.code === 4001) {
+          toast.error("You denied transaction signature.");
+        } else if (error.info.error.code === -32000) {
+          toast.error("Not enough tokens on your account");
+        }
+
+        toast.error(error);
       }
     } else {
-      console.error("Please install MetaMask on your browser");
+      toast.error("Please install MetaMask on your browser");
     }
   }
 );
