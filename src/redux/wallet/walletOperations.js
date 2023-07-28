@@ -12,8 +12,9 @@ export const connectToMetaMask = createAsyncThunk(
         const MMSDK = new MetaMaskSDK({ checkInstallationImmediately: true });
         console.log("MSDK:", MMSDK);
         const ethereum = MMSDK.getProvider();
-        console.log("ethereum:", ethereum);
-        return;
+        const signer = ethereum.getSigner();
+        const account = await signer.getAddress();
+        return account;
       } catch (error) {
         console.log(error);
         return;
@@ -40,18 +41,14 @@ export const connectToMetaMask = createAsyncThunk(
 );
 
 export const getBalance = createAsyncThunk("ethereum/balance", async () => {
-  if (typeof window.ethereum !== "undefined") {
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const accounts = await signer.getAddress();
-      const balance = await provider.getBalance(accounts);
-      return parseFloat(ethers.formatEther(balance)).toFixed(3);
-    } catch (error) {
-      toast.error(error.info.error.message);
-    }
-  } else {
-    throw new Error(toast.error("Please install MetaMask"));
+  try {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const accounts = await signer.getAddress();
+    const balance = await provider.getBalance(accounts);
+    return parseFloat(ethers.formatEther(balance)).toFixed(3);
+  } catch (error) {
+    toast.error(error.info.error.message);
   }
 });
 
