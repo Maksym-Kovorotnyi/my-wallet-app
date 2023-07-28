@@ -11,9 +11,7 @@ export const connectToMetaMask = createAsyncThunk(
       try {
         const MMSDK = new MetaMaskSDK();
         toast.info("Works");
-        const provider = MMSDK.getProvider();
-        toast.info("getprovider");
-        const account = await provider.request({
+        const account = await MMSDK.request({
           method: "eth_requestAccounts",
         });
         toast.info("connect to account");
