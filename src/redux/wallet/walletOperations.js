@@ -1,13 +1,24 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
+import MetaMaskSDK from "@metamask/sdk";
+import { isMobile } from "react-device-detect";
 
 export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
   async () => {
+    if (isMobile) {
+      try {
+        const MMSDK = new MetaMaskSDK({ checkInstallationImmediately: true });
+        console.log("MSDK:", MMSDK);
+        const ethereum = MMSDK.getProvider();
+        console.log("ethereum:", ethereum);
+      } catch (error) {
+        console.log(error);
+      }
+    }
     if (window.ethereum.isMetaMask) {
       try {
-        console.dir(window.ethereum.isMetaMask);
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const account = await signer.getAddress();
