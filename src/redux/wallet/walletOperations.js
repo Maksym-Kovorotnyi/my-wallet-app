@@ -13,25 +13,28 @@ export const connectToMetaMask = createAsyncThunk(
         console.log("MSDK:", MMSDK);
         const ethereum = MMSDK.getProvider();
         console.log("ethereum:", ethereum);
+        return;
       } catch (error) {
         console.log(error);
-      }
-    }
-    if (window.ethereum.isMetaMask) {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const account = await signer.getAddress();
-        return account;
-      } catch (error) {
-        if (error.info.error.code === 4001) {
-          throw new Error(toast.error("User reject connection"));
-        } else {
-          toast.error(error.info.error.message);
-        }
+        return;
       }
     } else {
-      throw new Error(toast.error("Please install MetaMask"));
+      if (window.ethereum.isMetaMask) {
+        try {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          const account = await signer.getAddress();
+          return account;
+        } catch (error) {
+          if (error.info.error.code === 4001) {
+            throw new Error(toast.error("User reject connection"));
+          } else {
+            toast.error(error.info.error.message);
+          }
+        }
+      } else {
+        throw new Error(toast.error("Please install MetaMask"));
+      }
     }
   }
 );
