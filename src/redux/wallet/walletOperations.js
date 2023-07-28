@@ -12,8 +12,9 @@ export const connectToMetaMask = createAsyncThunk(
     if (detectProvaider || window.ethereum.isMetaMask) {
       try {
         if (isMobile) {
-          new MetaMaskSDK();
-          const account = await window.ethereum.request({
+          const MMSDK = await new MetaMaskSDK();
+          const provider = await MMSDK.getProvider();
+          const account = await provider.request({
             method: "eth_requestAccounts",
             params: [],
           });
