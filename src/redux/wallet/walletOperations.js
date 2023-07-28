@@ -2,27 +2,32 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
 import { isMobile } from "react-device-detect";
 import { toast } from "react-toastify";
+import MetaMaskSDK from "@metamask/sdk";
 
 export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
   async () => {
-    // if (window.ethereum.isMetaMask) {
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const account = await signer.getAddress();
-      return account;
-    } catch (error) {
-      if (error.info.error.code === 4001) {
-        throw new Error(toast.error("User reject connection"));
-      } else {
-        toast.error(error.info.error.message);
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        if (isMobile) {
+          const MMSDK = new MetaMaskSDK();
+          const ethereum = MMSDK.getProvider();
+          ethereum.request({ method: "eth_requestAccounts", params: [] });
+        }
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const account = await signer.getAddress();
+        return account;
+      } catch (error) {
+        if (error.info.error.code === 4001) {
+          throw new Error(toast.error("User reject connection"));
+        } else {
+          toast.error(error.info.error.message);
+        }
       }
+    } else {
+      throw new Error(toast.error("Please install MetaMask"));
     }
-    // }
-    // else {
-    //   throw new Error(toast.error("Please install MetaMask"));
-    // }
   }
 );
 
