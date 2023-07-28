@@ -9,7 +9,7 @@ export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
   async () => {
     const detectProvider = await detectEthereumProvider();
-    if (isBrowser && detectProvider) {
+    if (isMobile && detectProvider) {
       try {
         const MMSDK = new MetaMaskSDK();
         // console.log(MMSDK);
