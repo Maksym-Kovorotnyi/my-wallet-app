@@ -5,11 +5,7 @@ import { toast } from "react-toastify";
 export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
   async () => {
-    if (
-      typeof window.ethereum !== "undefined" ||
-      (navigator.userAgent.toLowerCase().includes("mobile") &&
-        navigator.userAgent.toLowerCase().includes("metamask"))
-    ) {
+    if (typeof window.ethereum !== "undefined" || window.ethereum.isMetaMask) {
       try {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
