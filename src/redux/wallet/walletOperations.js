@@ -9,13 +9,12 @@ export const connectToMetaMask = createAsyncThunk(
   async () => {
     if (isMobile) {
       try {
-        const MMSDK = new MetaMaskSDK({ checkInstallationImmediately: false });
+        const MMSDK = new MetaMaskSDK();
         toast.info("Works");
-        const ethereum = MMSDK.getProvider();
-        toast.info("ethernum");
-        const signer = ethereum.getSigner();
-        toast.info("signer");
-        const account = await signer.getAddress();
+        const provider = MMSDK.getProvider();
+        const account = await provider.request({
+          method: "eth_requestAccounts",
+        });
         return account;
       } catch (error) {
         console.log(error);
