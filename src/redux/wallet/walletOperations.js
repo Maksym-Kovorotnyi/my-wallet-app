@@ -3,11 +3,13 @@ import { ethers } from "ethers";
 import { isMobile } from "react-device-detect";
 import { toast } from "react-toastify";
 import MetaMaskSDK from "@metamask/sdk";
+import detectEthereumProvider from "@metamask/detect-provider";
 
 export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
   async () => {
-    if (typeof window.ethereum !== "undefined") {
+    const detectProvaider = await detectEthereumProvider();
+    if (detectProvaider) {
       try {
         if (isMobile) {
           const MMSDK = new MetaMaskSDK();
