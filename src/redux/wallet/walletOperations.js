@@ -1,46 +1,25 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
-import { MetaMaskSDK } from "@metamask/sdk";
-import { isBrowser, isMobile } from "react-device-detect";
-import { detectEthereumProvider } from "@metamask/detect-provider";
 
 export const connectToMetaMask = createAsyncThunk(
   "ethereum/connect",
   async () => {
-    const detectProvider = await detectEthereumProvider();
-    if (isMobile && detectProvider) {
+    if (window.ethereum.isMetaMask) {
       try {
-        const MMSDK = new MetaMaskSDK();
-        // console.log(MMSDK);
-        const provider = MMSDK.getProvider();
-        const accounts = await provider.getAddress();
-        // console.log("ethereum:", ethereum);
-        // const account = ethereum.getAddress();
-        // console.log("account:", account);
-
-        return accounts;
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const account = await signer.getAddress();
+        return account;
       } catch (error) {
-        console.log(error);
-        return;
+        if (error.info.error.code === 4001) {
+          throw new Error(toast.error("User reject connection"));
+        } else {
+          toast.error(error.info.error.message);
+        }
       }
     } else {
-      if (window.ethereum.isMetaMask) {
-        try {
-          const provider = new ethers.BrowserProvider(window.ethereum);
-          const signer = await provider.getSigner();
-          const account = await signer.getAddress();
-          return account;
-        } catch (error) {
-          if (error.info.error.code === 4001) {
-            throw new Error(toast.error("User reject connection"));
-          } else {
-            toast.error(error.info.error.message);
-          }
-        }
-      } else {
-        throw new Error(toast.error("Please install MetaMask"));
-      }
+      throw new Error(toast.error("Please install MetaMask"));
     }
   }
 );
