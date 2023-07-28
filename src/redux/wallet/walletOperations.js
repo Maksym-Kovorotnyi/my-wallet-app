@@ -12,7 +12,10 @@ export const connectToMetaMask = createAsyncThunk(
         if (isMobile) {
           const MMSDK = new MetaMaskSDK();
           const ethereum = MMSDK.getProvider();
-          ethereum.request({ method: "eth_requestAccounts", params: [] });
+          return ethereum.request({
+            method: "eth_requestAccounts",
+            params: [],
+          });
         }
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
