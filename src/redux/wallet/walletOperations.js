@@ -9,7 +9,7 @@ export const connectToMetaMask = createAsyncThunk(
   async () => {
     if (isMobile) {
       try {
-        const MMSDK = new MetaMaskSDK({ checkInstallationImmediately: true });
+        const MMSDK = new MetaMaskSDK({ checkInstallationImmediately: false });
         toast.info("Works");
         const ethereum = MMSDK.getProvider();
         toast.info("ethernum");
