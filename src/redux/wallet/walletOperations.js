@@ -12,17 +12,17 @@ export const connectToMetaMask = createAsyncThunk(
     if (detectProvaider || window.ethereum.isMetaMask) {
       try {
         if (isMobile) {
-          const MMSDK = new MetaMaskSDK();
-          const ethereum = MMSDK.getProvider();
-          return ethereum.request({
+          new MetaMaskSDK();
+          const account = await window.ethereum.request({
             method: "eth_requestAccounts",
             params: [],
           });
+          return account;
         }
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const account = await signer.getAddress();
-        return account;
+        // const provider = new ethers.BrowserProvider(window.ethereum);
+        // const signer = await provider.getSigner();
+        // const account = await signer.getAddress();
+        // return account;
       } catch (error) {
         if (error.info.error.code === 4001) {
           throw new Error(toast.error("User reject connection"));
@@ -51,27 +51,23 @@ export const getBalance = createAsyncThunk("ethereum/balance", async () => {
 export const transferToken = createAsyncThunk(
   "ethereum/tranfer",
   async ({ adrress, value }) => {
-    if (typeof window.ethereum !== "undefined") {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const transaction = {
-          to: adrress,
-          value: ethers.parseEther(value),
-        };
-        await signer.sendTransaction(transaction);
-        return toast.success("Transaction success");
-      } catch (error) {
-        if (error.info.error.code === 4001) {
-          toast.error("You denied transaction signature.");
-        } else if (error.info.error.code === -32000) {
-          toast.error("Not enough tokens on your account");
-        }
-
-        toast.error(error);
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const transaction = {
+        to: adrress,
+        value: ethers.parseEther(value),
+      };
+      await signer.sendTransaction(transaction);
+      return toast.success("Transaction success");
+    } catch (error) {
+      if (error.info.error.code === 4001) {
+        toast.error("You denied transaction signature.");
+      } else if (error.info.error.code === -32000) {
+        toast.error("Not enough tokens on your account");
       }
-    } else {
-      throw new Error(toast.error("Please install MetaMask"));
+
+      toast.error(error);
     }
   }
 );
