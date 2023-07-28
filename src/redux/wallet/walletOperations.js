@@ -11,12 +11,12 @@ export const connectToMetaMask = createAsyncThunk(
     const detectProvider = await detectEthereumProvider();
     if (isBrowser && detectProvider) {
       try {
-        const accounts = await detectProvider.request({
+        const MMSDK = new MetaMaskSDK();
+        // console.log(MMSDK);
+        MMSDK.getProvider();
+        const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-        // const MMSDK = new MetaMaskSDK();
-        // console.log(MMSDK);
-        // const ethereum = MMSDK.getProvider();
         // console.log("ethereum:", ethereum);
         // const account = ethereum.getAddress();
         // console.log("account:", account);
